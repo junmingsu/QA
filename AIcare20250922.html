@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>長照智慧照護需求調查問卷</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .section {
+            padding: 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: linear-gradient(90deg, #e3f2fd, #bbdefb);
+            border-left: 4px solid #2196f3;
+            border-radius: 5px;
+        }
+        
+        .question-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        
+        .step-title {
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            color: #dc3545;
+            font-size: 1em;
+        }
+        
+        .step-note {
+            margin-bottom: 15px;
+            color: #6c757d;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .checkbox-group, .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .checkbox-item, .radio-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-item:hover, .radio-item:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+        
+        .checkbox-item input, .radio-item input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        .rating-scale {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 2px solid #e9ecef;
+        }
+        
+        .rating-question {
+            flex: 1;
+            font-weight: 500;
+            color: #495057;
+            margin-right: 20px;
+        }
+        
+        .rating-options {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .rating-options input {
+            margin-right: 5px;
+        }
+        
+        .info-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .ranking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .ranking-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .ranking-item label {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            color: #6c757d;
+        }
+        
+        .ranking-item input {
+            padding: 8px;
+            font-size: 0.9em;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .required {
+            color: #dc3545;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.4);
+        }
+        
+        .submit-area {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .checkbox-group, .radio-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .rating-scale {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .rating-question {
+                text-align: center;
+                margin-right: 0;
+            }
+            
+            .ranking-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>長照智慧照護需求調查</h1>
+            <p>預估時間：15分鐘 | 了解長照現場的實際需求與挑戰</p>
+        </div>
+        
+        <form id="surveyForm">
+            <!-- 基本資訊 -->
+            <div class="section">
+                <div class="section-title">基本資訊</div>
+                
+                <div class="form-group">
+                    <label>機構類型 <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="institutionType" value="residential" required>
+                            <span>住宿型長照機構</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="institutionType" value="daycare" required>
+                            <span>日間照護中心</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="institutionType" value="mixed" required>
+                            <span>複合型服務機構</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>服務住民人數</label>
+                        <select name="serviceCount">
+                            <option value="">請選擇</option>
+                            <option value="under30">30人以下</option>
+                            <option value="31-60">31-60人</option>
+                            <option value="61-100">61-100人</option>
+                            <option value="over100">100人以上</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>照護人員總數</label>
+                        <select name="staffCount">
+                            <option value="">請選擇</option>
+                            <option value="under5">5人以下</option>
+                            <option value="6-15">6-15人</option>
+                            <option value="16-30">16-30人</option>
+                            <option value="over30">30人以上</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>資訊化程度</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="digitalization" value="paper">
+                            <span>主要使用紙本記錄</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="digitalization" value="partial">
+                            <span>部分電腦化系統</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="digitalization" value="mostly">
+                            <span>大部分數位化</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="digitalization" value="full">
+                            <span>全面數位化管理</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主要挑戰 -->
+            <div class="section">
+                <div class="section-title">日常照護挑戰</div>
+                
+                <div class="question-group">
+                    <div class="question-title">目前遇到的主要困難？</div>
+                    
+                    <div class="step-title">步驟1：請勾選所有您目前遇到的困難（不限數量）</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="shortage" onchange="updateRankingVisibility()">
+                            <span>人力不足，照護品質難維持</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="paperwork" onchange="updateRankingVisibility()">
+                            <span>記錄繁瑣，花太多時間處理文書</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="monitoring" onchange="updateRankingVisibility()">
+                            <span>住民狀況變化難即時掌握</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="consistency" onchange="updateRankingVisibility()">
+                            <span>照護標準化困難，品質不一致</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="emotion" onchange="updateRankingVisibility()">
+                            <span>住民情緒安撫困難</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="training" onchange="updateRankingVisibility()">
+                            <span>新手照護員上手慢</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="communication" onchange="updateRankingVisibility()">
+                            <span>與家屬溝通費時費力</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="safety_monitoring" onchange="updateRankingVisibility()">
+                            <span>住民安全狀況監測困難</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="emergency_response" onchange="updateRankingVisibility()">
+                            <span>緊急狀況發現和應變不及時</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="challenges" value="behavior_monitoring" onchange="updateRankingVisibility()">
+                            <span>住民行為異常難以即時察覺</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-title">步驟2：請為您勾選的困難按嚴重程度排序</div>
+                    <div class="step-note">在下方輸入框中填入排序數字（1=最嚴重，2=次嚴重，以此類推）</div>
+                    
+                    <div class="ranking-grid" id="challengeRanking">
+                        <div class="ranking-item" id="rank_shortage" style="display: none;">
+                            <label>人力不足排序</label>
+                            <input type="number" name="challengeRank_shortage" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="rank_paperwork" style="display: none;">
+                            <label>記錄繁瑣排序</label>
+                            <input type="number" name="challengeRank_paperwork" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="rank_monitoring" style="display: none;">
+                            <label>狀況監測困難排序</label>
+                            <input type="number" name="challengeRank_monitoring" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="rank_consistency" style="display: none;">
+                            <label>品質不一致排序</label>
+                            <input type="number" name="challengeRank_consistency" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="rank_emotion" style="display: none;">
+                            <label>情緒安撫困難排序</label>
+                            <input type="number" name="challengeRank_emotion" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="rank_training" style="display: none;">
+                            <label>新手上手慢排序</label>
+                            <input type="number" name="challengeRank_training" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="rank_communication" style="display: none;">
+                            <label>家屬溝通排序</label>
+                            <input type="number" name="challengeRank_communication" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="rank_safety_monitoring" style="display: none;">
+                            <label>安全監測困難排序</label>
+                            <input type="number" name="challengeRank_safety_monitoring" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="rank_emergency_response" style="display: none;">
+                            <label>緊急應變不及時排序</label>
+                            <input type="number" name="challengeRank_emergency_response" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="rank_behavior_monitoring" style="display: none;">
+                            <label>異常行為察覺排序</label>
+                            <input type="number" name="challengeRank_behavior_monitoring" min="1" placeholder="排序">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <div class="question-title">以下情況在您機構的困擾程度？（1=不困擾，5=非常困擾）</div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">照護員不熟悉住民的個人喜好和習慣</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="challenge1" value="1"> 1</label>
+                            <label><input type="radio" name="challenge1" value="2"> 2</label>
+                            <label><input type="radio" name="challenge1" value="3"> 3</label>
+                            <label><input type="radio" name="challenge1" value="4"> 4</label>
+                            <label><input type="radio" name="challenge1" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">不同照護員提供的照護品質差異很大</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="challenge2" value="1"> 1</label>
+                            <label><input type="radio" name="challenge2" value="2"> 2</label>
+                            <label><input type="radio" name="challenge2" value="3"> 3</label>
+                            <label><input type="radio" name="challenge2" value="4"> 4</label>
+                            <label><input type="radio" name="challenge2" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">交班時重要資訊交接不完整</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="challenge3" value="1"> 1</label>
+                            <label><input type="radio" name="challenge3" value="2"> 2</label>
+                            <label><input type="radio" name="challenge3" value="3"> 3</label>
+                            <label><input type="radio" name="challenge3" value="4"> 4</label>
+                            <label><input type="radio" name="challenge3" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">住民安全狀況監測的即時性</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="challenge4" value="1"> 1</label>
+                            <label><input type="radio" name="challenge4" value="2"> 2</label>
+                            <label><input type="radio" name="challenge4" value="3"> 3</label>
+                            <label><input type="radio" name="challenge4" value="4"> 4</label>
+                            <label><input type="radio" name="challenge4" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">緊急事件（如跌倒）的發現速度</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="challenge5" value="1"> 1</label>
+                            <label><input type="radio" name="challenge5" value="2"> 2</label>
+                            <label><input type="radio" name="challenge5" value="3"> 3</label>
+                            <label><input type="radio" name="challenge5" value="4"> 4</label>
+                            <label><input type="radio" name="challenge5" value="5"> 5</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 安全監測需求 -->
+            <div class="section">
+                <div class="section-title">安全監測需求</div>
+                
+                <div class="question-group">
+                    <div class="question-title">以下安全監測功能的重要程度？（1=不重要，5=非常重要）</div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">跌倒事件即時偵測通知</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="safety1" value="1"> 1</label>
+                            <label><input type="radio" name="safety1" value="2"> 2</label>
+                            <label><input type="radio" name="safety1" value="3"> 3</label>
+                            <label><input type="radio" name="safety1" value="4"> 4</label>
+                            <label><input type="radio" name="safety1" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">住民長時間無活動異常警示</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="safety2" value="1"> 1</label>
+                            <label><input type="radio" name="safety2" value="2"> 2</label>
+                            <label><input type="radio" name="safety2" value="3"> 3</label>
+                            <label><input type="radio" name="safety2" value="4"> 4</label>
+                            <label><input type="radio" name="safety2" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">離床/離開安全區域警示</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="safety3" value="1"> 1</label>
+                            <label><input type="radio" name="safety3" value="2"> 2</label>
+                            <label><input type="radio" name="safety3" value="3"> 3</label>
+                            <label><input type="radio" name="safety3" value="4"> 4</label>
+                            <label><input type="radio" name="safety3" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">夜間異常行為偵測</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="safety4" value="1"> 1</label>
+                            <label><input type="radio" name="safety4" value="2"> 2</label>
+                            <label><input type="radio" name="safety4" value="3"> 3</label>
+                            <label><input type="radio" name="safety4" value="4"> 4</label>
+                            <label><input type="radio" name="safety4" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-scale">
+                        <div class="rating-question">住民活動量變化趨勢分析</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="safety5" value="1"> 1</label>
+                            <label><input type="radio" name="safety5" value="2"> 2</label>
+                            <label><input type="radio" name="safety5" value="3"> 3</label>
+                            <label><input type="radio" name="safety5" value="4"> 4</label>
+                            <label><input type="radio" name="safety5" value="5"> 5</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <div class="question-title">目前如何處理這些安全監測需求？（可複選）</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="currentMethods" value="manual_patrol">
+                            <span>人工定時巡房</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="currentMethods" value="call_bell">
+                            <span>緊急呼叫鈴系統</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="currentMethods" value="bed_sensor">
+                            <span>床墊感應器</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="currentMethods" value="camera_monitoring">
+                            <span>監視器人工監看</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="currentMethods" value="family_assist">
+                            <span>家屬協助看護</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="currentMethods" value="no_system">
+                            <span>沒有特別的監測系統</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>目前安全監測方式的主要困難？</label>
+                    <textarea name="safetyIssues" rows="3" placeholder="例如：人力不足導致巡房間隔過長、設備誤報率高、夜間監測人力缺乏等"></textarea>
+                </div>
+            </div>
+
+            <!-- 個人化照護需求 -->
+            <div class="section">
+                <div class="section-title">個人化照護需求</div>
+                
+                <div class="question-group">
+                    <div class="question-title">如果有系統能幫助照護員更了解住民？</div>
+                    
+                    <div class="step-title">步驟1：請勾選所有您希望系統包含的資訊類型（不限數量）</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="personalInfo" value="communication" onchange="updatePersonalInfoRanking()">
+                            <span>溝通偏好和稱呼方式</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="personalInfo" value="preferences" onchange="updatePersonalInfoRanking()">
+                            <span>個人喜好（音樂、食物、活動）</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="personalInfo" value="comfort" onchange="updatePersonalInfoRanking()">
+                            <span>情緒安撫的有效方式</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="personalInfo" value="health" onchange="updatePersonalInfoRanking()">
+                            <span>身體狀況特殊注意事項</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="personalInfo" value="habits" onchange="updatePersonalInfoRanking()">
+                            <span>生活習慣（睡眠、飲食等）</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="personalInfo" value="family" onchange="updatePersonalInfoRanking()">
+                            <span>家屬互動注意要點</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="personalInfo" value="cognitive" onchange="updatePersonalInfoRanking()">
+                            <span>認知程度和溝通方式調整</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="personalInfo" value="history" onchange="updatePersonalInfoRanking()">
+                            <span>過往突發事件處理經驗</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-title">步驟2：請為您勾選的資訊類型按重要程度排序</div>
+                    <div class="step-note">在下方輸入框中填入排序數字（1=最重要，2=次重要，以此類推）</div>
+                    
+                    <div class="ranking-grid" id="personalInfoRanking">
+                        <div class="ranking-item" id="personal_communication" style="display: none;">
+                            <label>溝通偏好重要程度排序</label>
+                            <input type="number" name="personalInfoRank_communication" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="personal_preferences" style="display: none;">
+                            <label>個人喜好重要程度排序</label>
+                            <input type="number" name="personalInfoRank_preferences" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="personal_comfort" style="display: none;">
+                            <label>情緒安撫重要程度排序</label>
+                            <input type="number" name="personalInfoRank_comfort" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="personal_health" style="display: none;">
+                            <label>身體狀況注意事項排序</label>
+                            <input type="number" name="personalInfoRank_health" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="personal_habits" style="display: none;">
+                            <label>生活習慣重要程度排序</label>
+                            <input type="number" name="personalInfoRank_habits" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="personal_family" style="display: none;">
+                            <label>家屬互動重要程度排序</label>
+                            <input type="number" name="personalInfoRank_family" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="personal_cognitive" style="display: none;">
+                            <label>認知溝通重要程度排序</label>
+                            <input type="number" name="personalInfoRank_cognitive" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="personal_history" style="display: none;">
+                            <label>突發事件經驗排序</label>
+                            <input type="number" name="personalInfoRank_history" min="1" placeholder="排序">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 科技輔助接受度 -->
+            <div class="section">
+                <div class="section-title">科技輔助工具接受度</div>
+                
+                <div class="question-group">
+                    <div class="question-title">情境測試：以下輔助方式對您的有用程度？（1=沒用，5=很有用）</div>
+                    
+                    <div class="info-box">
+                        <strong>情境A：</strong> 進房照護前，系統提示住民當日狀況和個人化互動建議
+                    </div>
+                    <div class="rating-scale">
+                        <div class="rating-question">有用程度</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="scenario1" value="1"> 1</label>
+                            <label><input type="radio" name="scenario1" value="2"> 2</label>
+                            <label><input type="radio" name="scenario1" value="3"> 3</label>
+                            <label><input type="radio" name="scenario1" value="4"> 4</label>
+                            <label><input type="radio" name="scenario1" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>情境B：</strong> 系統協助記錄和分析住民的日常狀況變化趨勢
+                    </div>
+                    <div class="rating-scale">
+                        <div class="rating-question">有用程度</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="scenario2" value="1"> 1</label>
+                            <label><input type="radio" name="scenario2" value="2"> 2</label>
+                            <label><input type="radio" name="scenario2" value="3"> 3</label>
+                            <label><input type="radio" name="scenario2" value="4"> 4</label>
+                            <label><input type="radio" name="scenario2" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>情境C：</strong> 數位輔助工具提供個人化的互動內容和陪伴功能
+                    </div>
+                    <div class="rating-scale">
+                        <div class="rating-question">有用程度</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="scenario3" value="1"> 1</label>
+                            <label><input type="radio" name="scenario3" value="2"> 2</label>
+                            <label><input type="radio" name="scenario3" value="3"> 3</label>
+                            <label><input type="radio" name="scenario3" value="4"> 4</label>
+                            <label><input type="radio" name="scenario3" value="5"> 5</label>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>情境D：</strong> 系統自動偵測並即時通知跌倒、長時間無活動等安全異常狀況
+                    </div>
+                    <div class="rating-scale">
+                        <div class="rating-question">有用程度</div>
+                        <div class="rating-options">
+                            <label><input type="radio" name="scenario4" value="1"> 1</label>
+                            <label><input type="radio" name="scenario4" value="2"> 2</label>
+                            <label><input type="radio" name="scenario4" value="3"> 3</label>
+                            <label><input type="radio" name="scenario4" value="4"> 4</label>
+                            <label><input type="radio" name="scenario4" value="5"> 5</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <div class="question-title">對於導入科技輔助工具，最主要的擔憂是？（可複選）</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="concerns" value="complexity">
+                            <span>操作太複雜，照護員學不會</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="concerns" value="cost">
+                            <span>購置和維護成本負擔重</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="concerns" value="acceptance">
+                            <span>住民或家屬接受度問題</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="concerns" value="privacy">
+                            <span>個人資料隱私安全問題</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="concerns" value="reliability">
+                            <span>技術故障影響照護服務</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="concerns" value="human_touch">
+                            <span>擔心失去人性關懷溫暖</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 改善意願評估 -->
+            <div class="section">
+                <div class="section-title">改善意願與投資評估</div>
+                
+                <div class="question-group">
+                    <div class="question-title">最希望優先改善什麼？</div>
+                    
+                    <div class="step-title">步驟1：請勾選所有您希望改善的項目（不限數量）</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="priorities" value="efficiency" onchange="updatePriorityRanking()">
+                            <span>提高整體照護效率</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="priorities" value="quality" onchange="updatePriorityRanking()">
+                            <span>提升照護品質穩定性</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="priorities" value="safety" onchange="updatePriorityRanking()">
+                            <span>強化住民安全監測</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="priorities" value="training" onchange="updatePriorityRanking()">
+                            <span>縮短新手培訓時間</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="priorities" value="satisfaction" onchange="updatePriorityRanking()">
+                            <span>提高住民生活滿意度</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="priorities" value="workload" onchange="updatePriorityRanking()">
+                            <span>減輕照護員工作負擔</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="priorities" value="communication" onchange="updatePriorityRanking()">
+                            <span>改善與家屬溝通效率</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-title">步驟2：請為您勾選的改善項目按優先順序排序</div>
+                    <div class="step-note">在下方輸入框中填入優先順序（1=最優先，2=次優先，以此類推）</div>
+                    
+                    <div class="ranking-grid" id="priorityRanking">
+                        <div class="ranking-item" id="priority_efficiency" style="display: none;">
+                            <label>提高照護效率排序</label>
+                            <input type="number" name="priorityRank_efficiency" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="priority_quality" style="display: none;">
+                            <label>提升品質穩定性排序</label>
+                            <input type="number" name="priorityRank_quality" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="priority_safety" style="display: none;">
+                            <label>強化安全監測排序</label>
+                            <input type="number" name="priorityRank_safety" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="priority_training" style="display: none;">
+                            <label>縮短培訓時間排序</label>
+                            <input type="number" name="priorityRank_training" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="priority_satisfaction" style="display: none;">
+                            <label>提高住民滿意度排序</label>
+                            <input type="number" name="priorityRank_satisfaction" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="priority_workload" style="display: none;">
+                            <label>減輕工作負擔排序</label>
+                            <input type="number" name="priorityRank_workload" min="1" placeholder="排序">
+                        </div>
+                        <div class="ranking-item" id="priority_communication" style="display: none;">
+                            <label>改善家屬溝通排序</label>
+                            <input type="number" name="priorityRank_communication" min="1" placeholder="排序">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>如果有合適的解決方案，您的投資意願如何？</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="investment" value="very_willing">
+                            <span>非常願意投資導入</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="investment" value="consider">
+                            <span>可以考慮評估</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="investment" value="need_evaluation">
+                            <span>需要詳細效益評估</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="investment" value="not_interested">
+                            <span>目前沒有投資意願</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>可接受的月費預算範圍？</label>
+                    <select name="budget">
+                        <option value="">請選擇</option>
+                        <option value="under5k">5千元以下</option>
+                        <option value="5k-1w">5千-1萬元</option>
+                        <option value="1w-3w">1萬-3萬元</option>
+                        <option value="3w-5w">3萬-5萬元</option>
+                        <option value="over5w">5萬元以上</option>
+                        <option value="depends">視實際效果而定</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 開放建議 -->
+            <div class="section">
+                <div class="section-title">意見回饋與建議</div>
+                
+                <div class="form-group">
+                    <label>您認為最需要什麼樣的科技輔助來改善長照服務品質？</label>
+                    <textarea name="suggestions" rows="4" placeholder="請具體分享您的想法和建議..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>對於智慧化長照服務，還有其他想法或期待嗎？</label>
+                    <textarea name="additional" rows="3" placeholder="任何相關的想法或建議都歡迎分享..."></textarea>
+                </div>
+            </div>
+
+            <!-- 聯絡資訊 -->
+            <div class="section">
+                <div class="section-title">基本聯絡資訊</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>機構名稱 <span class="required">*</span></label>
+                        <input type="text" name="institutionName" required placeholder="請填寫完整機構名稱">
+                    </div>
+                    <div class="form-group">
+                        <label>填答人姓名 <span class="required">*</span></label>
+                        <input type="text" name="contactName" required placeholder="請填寫您的姓名">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>職稱</label>
+                        <input type="text" name="title" placeholder="例如：主任、組長、護理長等">
+                    </div>
+                    <div class="form-group">
+                        <label>聯絡電話</label>
+                        <input type="tel" name="phone" placeholder="請填寫可聯絡的電話">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="請填寫Email地址（選填）">
+                </div>
+
+                <div class="question-group">
+                    <div class="question-title">後續參與意願</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="participation" value="follow_up">
+                            <span>願意接受後續深度訪談</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="participation" value="trial">
+                            <span>有興趣參與新系統試用</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="participation" value="updates">
+                            <span>希望收到相關技術發展資訊</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="submit-area">
+                <button type="submit" class="btn">提交問卷</button>
+                <p style="margin-top: 10px; color: #6c757d; font-size: 0.9em;">
+                    感謝您的寶貴時間與專業意見！
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // 動態顯示排序輸入框
+        function updateRankingVisibility() {
+            const challenges = document.querySelectorAll('input[name="challenges"]:checked');
+            const challengeRanking = document.getElementById('challengeRanking');
+            
+            // 隱藏所有排序項目
+            challengeRanking.querySelectorAll('.ranking-item').forEach(item => {
+                item.style.display = 'none';
+                item.querySelector('input').value = ''; // 清空值
+            });
+            
+            // 顯示被勾選項目的排序輸入框
+            challenges.forEach(challenge => {
+                const rankingItem = document.getElementById('rank_' + challenge.value);
+                if (rankingItem) {
+                    rankingItem.style.display = 'block';
+                }
+            });
+        }
+
+        function updatePersonalInfoRanking() {
+            const personalInfos = document.querySelectorAll('input[name="personalInfo"]:checked');
+            const personalInfoRanking = document.getElementById('personalInfoRanking');
+            
+            // 隱藏所有排序項目
+            personalInfoRanking.querySelectorAll('.ranking-item').forEach(item => {
+                item.style.display = 'none';
+                item.querySelector('input').value = ''; // 清空值
+            });
+            
+            // 顯示被勾選項目的排序輸入框
+            personalInfos.forEach(personalInfo => {
+                const rankingItem = document.getElementById('personal_' + personalInfo.value);
+                if (rankingItem) {
+                    rankingItem.style.display = 'block';
+                }
+            });
+        }
+
+        function updatePriorityRanking() {
+            const priorities = document.querySelectorAll('input[name="priorities"]:checked');
+            const priorityRanking = document.getElementById('priorityRanking');
+            
+            // 隱藏所有排序項目
+            priorityRanking.querySelectorAll('.ranking-item').forEach(item => {
+                item.style.display = 'none';
+                item.querySelector('input').value = ''; // 清空值
+            });
+            
+            // 顯示被勾選項目的排序輸入框
+            priorities.forEach(priority => {
+                const rankingItem = document.getElementById('priority_' + priority.value);
+                if (rankingItem) {
+                    rankingItem.style.display = 'block';
+                }
+            });
+        }
+
+        // 表單提交處理
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 收集表單數據
+            const formData = new FormData(this);
+            const results = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (results[key]) {
+                    if (Array.isArray(results[key])) {
+                        results[key].push(value);
+                    } else {
+                        results[key] = [results[key], value];
+                    }
+                } else {
+                    results[key] = value;
+                }
+            }
+
+            // 添加提交時間
+            results.submitTime = new Date().toISOString();
+            
+            // 簡單驗證
+            if (!results.institutionName || !results.contactName) {
+                alert('請填寫機構名稱和聯絡人姓名');
+                return;
+            }
+            
+            // 這裡可以添加提交到服務器的邏輯
+            // 目前先顯示成功消息
+            alert('問卷提交成功！感謝您的參與。\n我們會盡快與您聯繫進行後續訪談。');
+            
+            // 下載數據備份
+            downloadResults(results);
+        });
+        
+        // 下載結果功能
+        function downloadResults(data) {
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `長照需求調研_${data.institutionName}_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
