@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>長照智慧照護需求調查問卷</title>
+    <title>長照智慧照護需求調研問卷</title>
     <style>
         * {
             margin: 0;
@@ -282,8 +282,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>長照智慧照護需求調查</h1>
-            <p>預估時間：15分鐘 | 了解長照現場的實際需求與挑戰</p>
+            <h1>長照智慧照護需求調研</h1>
+            <p>預估時間：15分鐘 | 深度了解長照現場的實際需求與挑戰</p>
         </div>
         
         <form id="surveyForm">
@@ -1037,6 +1037,12 @@
         document.getElementById('surveyForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // 顯示提交中狀態
+            const submitBtn = this.querySelector('.btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '提交中...';
+            submitBtn.disabled = true;
+            
             // 收集表單數據
             const formData = new FormData(this);
             const results = {};
@@ -1059,16 +1065,60 @@
             // 簡單驗證
             if (!results.institutionName || !results.contactName) {
                 alert('請填寫機構名稱和聯絡人姓名');
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
                 return;
             }
             
-            // 這裡可以添加提交到服務器的邏輯
-            // 目前先顯示成功消息
-            alert('問卷提交成功！感謝您的參與。\n我們會盡快與您聯繫進行後續訪談。');
-            
-            // 下載數據備份
-            downloadResults(results);
+            // 提交到Google Apps Script
+            submitToGoogleScript(results, submitBtn, originalText);
         });
+
+        // 提交到Google Apps Script
+        async function submitToGoogleScript(data, submitBtn, originalText) {
+            // 請將下面的網址替換為您的Apps Script部署網址
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzIhR77qFNkjK5k47wynl_HKOFeTIDpJGoC9ArVOpf5vno0FaUCrRCHXIz7AzQPHrqNRQ/exec';
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.text();
+                const parsedResult = JSON.parse(result);
+                
+                if (parsedResult.status === 'success') {
+                    alert('問卷提交成功！感謝您的參與。\n我們會盡快與您聯繫進行後續訪談。');
+                    
+                    // 成功後重置表單
+                    document.getElementById('surveyForm').reset();
+                    
+                    // 隱藏所有排序框
+                    document.querySelectorAll('.ranking-item').forEach(item => {
+                        item.style.display = 'none';
+                    });
+                    
+                } else {
+                    throw new Error(parsedResult.message || '提交失敗');
+                }
+                
+            } catch (error) {
+                console.error('提交錯誤:', error);
+                alert('提交失敗，請稍後再試。\n錯誤信息: ' + error.message);
+                
+                // 提交失敗時下載數據備份
+                downloadResults(data);
+            } finally {
+                // 恢復按鈕狀態
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
         
         // 下載結果功能
         function downloadResults(data) {
