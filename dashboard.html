@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>長照問卷即時分析儀表板</title>
+    
+    <!-- Chart.js for 圖表 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .ranking-table th,
+        .ranking-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .ranking-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .ranking-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+            margin: 20px 0;
+        }
+        
+        .error-message {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .success-message {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .last-update {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>長照智慧照護問卷分析儀表板</h1>
+            <p>即時資料分析與視覺化呈現</p>
+            <div class="last-update" id="lastUpdate">載入中...</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="loadAndAnalyzeData()" id="refreshBtn">重新整理資料</button>
+            <button class="btn" onclick="exportReport()" id="exportBtn">匯出報告</button>
+            <button class="btn" onclick="toggleAutoRefresh()" id="autoRefreshBtn">開啟自動更新</button>
+        </div>
+        
+        <div id="loadingMessage" class="loading" style="display: none;">
+            正在載入和分析資料...
+        </div>
+        
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        
+        <!-- 統計概覽 -->
+        <div class="stats-overview" id="statsOverview">
+            <div class="stat-card">
+                <div class="stat-number" id="totalResponses">0</div>
+                <div class="stat-label">總回覆數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="todayResponses">0</div>
+                <div class="stat-label">今日新增</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgSatisfaction">0%</div>
+                <div class="stat-label">平均滿意度</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="investmentWilling">0%</div>
+                <div class="stat-label">願意投資比例</div>
+            </div>
+        </div>
+        
+        <!-- 圖表區域 -->
+        <div class="charts-grid">
+            <!-- 機構類型分布 -->
+            <div class="chart-card">
+                <div class="chart-title">機構類型分布</div>
+                <canvas id="institutionTypeChart" width="400" height="300"></canvas>
+            </div>
+            
+            <!-- 主要挑戰排序 -->
+            <div class="chart-card">
+                <div class="chart-title">主要挑戰嚴重程度排序（平均值）</div>
+                <canvas id="challengesChart" width="400" height="300"></canvas>
+            </div>
+            
+            <!-- 個人化資訊需求 -->
+            <div class="chart-card">
+                <div class="chart-title">個人化資訊重要程度排序</div>
+                <canvas id="personalInfoChart" width="400" height="300"></canvas>
+            </div>
+            
+            <!-- 科技接受度 -->
+            <div class="chart-card">
+                <div class="chart-title">科技輔助情境接受度評分</div>
+                <canvas id="technologyChart" width="400" height="300"></canvas>
+            </div>
+            
+            <!-- 投資意願分布 -->
+            <div class="chart-card">
+                <div class="chart-title">投資意願與預算分布</div>
+                <canvas id="investmentChart" width="400" height="300"></canvas>
+            </div>
+            
+            <!-- 回覆趨勢 -->
+            <div class="chart-card">
+                <div class="chart-title">每日回覆趨勢</div>
+                <canvas id="trendsChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+        
+        <!-- 詳細排序表格 -->
+        <div class="chart-card">
+            <div class="chart-title">詳細排序分析表</div>
+            <table class="ranking-table" id="rankingTable">
+                <thead>
+                    <tr>
+                        <th>項目類別</th>
+                        <th>項目名稱</th>
+                        <th>平均排序</th>
+                        <th>填答數量</th>
+                        <th>重要程度</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 配置設定
+        const CONFIG = {
+            // 您的 Apps Script Web App 網址
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzIhR77qFNkjK5k47wynl_HKOFeTIDpJGoC9ArVOpf5vno0FaUCrRCHXIz7AzQPHrqNRQ/exec',
+            
+            // 自動更新間隔（毫秒）
+            AUTO_REFRESH_INTERVAL: 300000 // 5分鐘
+        };
+        
+        // 全域變量
+        let autoRefreshTimer = null;
+        let currentData = null;
+        let charts = {};
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAndAnalyzeData();
+        });
+        
+        // 載入和分析資料
+        async function loadAndAnalyzeData() {
+            showLoading(true);
+            hideError();
+            
+            try {
+                // 透過 Apps Script 取得資料
+                const data = await fetchDataFromAppsScript();
+                
+                if (data && data.length > 0) {
+                    currentData = data;
+                    analyzeAndDisplayData(data);
+                    updateLastUpdateTime();
+                    showSuccess('資料載入成功！');
+                } else {
+                    showError('沒有找到資料，請檢查試算表是否有內容。');
+                }
+                
+            } catch (error) {
+                console.error('載入資料失敗:', error);
+                showError('載入資料失敗: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // 透過 Apps Script 取得資料
+        async function fetchDataFromAppsScript() {
+            try {
+                const response = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getData', {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP錯誤 ${response.status}: 無法取得資料，請檢查 Apps Script 設定`);
+                }
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    console.log(`成功取得 ${result.total} 筆資料`);
+                    return result.data;
+                } else {
+                    throw new Error(result.message || '取得資料失敗');
+                }
+                
+            } catch (error) {
+                console.error('Apps Script API錯誤:', error);
+                throw error;
+            }
+        }
+        
+        // 取得預處理分析結果
+        async function fetchAnalysisFromAppsScript() {
+            try {
+                const response = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getAnalysis', {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP錯誤 ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    return result.analysis;
+                } else {
+                    throw new Error(result.message || '取得分析失敗');
+                }
+                
+            } catch (error) {
+                console.error('取得分析失敗:', error);
+                return null;
+            }
+        }
+        
+        // 分析和顯示資料
+        function analyzeAndDisplayData(data) {
+            // 更新統計概覽
+            updateStatsOverview(data);
+            
+            // 更新圖表
+            updateInstitutionTypeChart(data);
+            updateChallengesChart(data);
+            updatePersonalInfoChart(data);
+            updateTechnologyChart(data);
+            updateInvestmentChart(data);
+            updateTrendsChart(data);
+            
+            // 更新詳細表格
+            updateRankingTable(data);
+        }
+        
+        // 更新統計概覽
+        function updateStatsOverview(data) {
+            const totalResponses = data.length;
+            const today = new Date().toDateString();
+            const todayResponses = data.filter(row => {
+                const submitDate = new Date(row['填答時間']).toDateString();
+                return submitDate === today;
+            }).length;
+            
+            // 計算平均滿意度（假設從科技情境評分計算）
+            const satisfactionScores = data.map(row => {
+                const scores = [
+                    parseInt(row['情境A_有用程度']) || 0,
+                    parseInt(row['情境B_有用程度']) || 0,
+                    parseInt(row['情境C_有用程度']) || 0,
+                    parseInt(row['情境D_有用程度']) || 0
+                ];
+                return scores.reduce((a, b) => a + b, 0) / scores.length;
+            }).filter(score => score > 0);
+            
+            const avgSatisfaction = satisfactionScores.length > 0 
+                ? Math.round(satisfactionScores.reduce((a, b) => a + b, 0) / satisfactionScores.length / 5 * 100)
+                : 0;
+            
+            // 計算願意投資比例
+            const investmentWilling = data.filter(row => {
+                const investment = row['投資意願'];
+                return investment === 'very_willing' || investment === 'consider';
+            }).length;
+            
+            const investmentPercentage = totalResponses > 0 
+                ? Math.round(investmentWilling / totalResponses * 100) 
+                : 0;
+            
+            // 更新 DOM
+            document.getElementById('totalResponses').textContent = totalResponses;
+            document.getElementById('todayResponses').textContent = todayResponses;
+            document.getElementById('avgSatisfaction').textContent = avgSatisfaction + '%';
+            document.getElementById('investmentWilling').textContent = investmentPercentage + '%';
+        }
+        
+        // 更新機構類型圖表
+        function updateInstitutionTypeChart(data) {
+            const typeCount = {};
+            data.forEach(row => {
+                const type = row['機構類型'] || '未填寫';
+                typeCount[type] = (typeCount[type] || 0) + 1;
+            });
+            
+            const typeLabels = {
+                'residential': '住宿型長照機構',
+                'daycare': '日間照護中心',
+                'mixed': '複合型服務機構',
+                '未填寫': '未填寫'
+            };
+            
+            const labels = Object.keys(typeCount).map(key => typeLabels[key] || key);
+            const values = Object.values(typeCount);
+            
+            if (charts.institutionType) {
+                charts.institutionType.destroy();
+            }
+            
+            const ctx = document.getElementById('institutionTypeChart').getContext('2d');
+            charts.institutionType = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            '#3498db',
+                            '#e74c3c',
+                            '#2ecc71',
+                            '#95a5a6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新挑戰圖表
+        function updateChallengesChart(data) {
+            const challengeRanks = calculateAverageRanks(data, [
+                '人力不足_排序',
+                '記錄繁瑣_排序',
+                '狀況監測困難_排序',
+                '品質不一致_排序',
+                '情緒安撫困難_排序'
+            ]);
+            
+            const labels = Object.keys(challengeRanks).map(key => key.replace('_排序', ''));
+            const values = Object.values(challengeRanks);
+            
+            if (charts.challenges) {
+                charts.challenges.destroy();
+            }
+            
+            const ctx = document.getElementById('challengesChart').getContext('2d');
+            charts.challenges = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '平均排序（越小越嚴重）',
+                        data: values,
+                        backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                        borderColor: '#e74c3c',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '平均排序'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新個人化資訊圖表
+        function updatePersonalInfoChart(data) {
+            const infoRanks = calculateAverageRanks(data, [
+                '溝通偏好_排序',
+                '個人喜好_排序',
+                '情緒安撫_排序',
+                '身體狀況_排序',
+                '生活習慣_排序',
+                '家屬互動_排序',
+                '認知溝通_排序',
+                '突發經驗_排序'
+            ]);
+            
+            // 如果沒有有效資料，顯示空狀態
+            if (Object.keys(infoRanks).length === 0) {
+                if (charts.personalInfo) {
+                    charts.personalInfo.destroy();
+                }
+                const ctx = document.getElementById('personalInfoChart').getContext('2d');
+                charts.personalInfo = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['暫無資料'],
+                        datasets: [{
+                            label: '暫無有效排序資料',
+                            data: [0],
+                            backgroundColor: 'rgba(200, 200, 200, 0.5)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+                return;
+            }
+            
+            const labels = Object.keys(infoRanks).map(key => key.replace('_排序', ''));
+            const values = Object.values(infoRanks);
+            
+            if (charts.personalInfo) {
+                charts.personalInfo.destroy();
+            }
+            
+            const ctx = document.getElementById('personalInfoChart').getContext('2d');
+            charts.personalInfo = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '平均排序（越小越重要）',
+                        data: values,
+                        backgroundColor: 'rgba(155, 89, 182, 0.7)',
+                        borderColor: '#9b59b6',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: true }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '平均排序'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新科技接受度圖表
+        function updateTechnologyChart(data) {
+            const scenarioScores = calculateAverageScores(data, [
+                '情境A_有用程度',
+                '情境B_有用程度',
+                '情境C_有用程度',
+                '情境D_有用程度'
+            ]);
+            
+            // 如果沒有有效資料，顯示空狀態
+            if (Object.keys(scenarioScores).length === 0) {
+                if (charts.technology) {
+                    charts.technology.destroy();
+                }
+                const ctx = document.getElementById('technologyChart').getContext('2d');
+                charts.technology = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['暫無資料'],
+                        datasets: [{
+                            label: '暫無評分資料',
+                            data: [0],
+                            backgroundColor: 'rgba(200, 200, 200, 0.2)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { r: { beginAtZero: true, max: 5 } }
+                    }
+                });
+                return;
+            }
+            
+            const labels = ['進房前提示', '狀況趨勢分析', '個人化互動', '安全異常偵測'];
+            const values = [
+                scenarioScores['情境A_有用程度'] || 0,
+                scenarioScores['情境B_有用程度'] || 0,
+                scenarioScores['情境C_有用程度'] || 0,
+                scenarioScores['情境D_有用程度'] || 0
+            ];
+            
+            if (charts.technology) {
+                charts.technology.destroy();
+            }
+            
+            const ctx = document.getElementById('technologyChart').getContext('2d');
+            charts.technology = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '平均接受度評分',
+                        data: values,
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: '#3498db',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#3498db'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 5,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新投資意願圖表
+        function updateInvestmentChart(data) {
+            const investmentCount = {};
+            data.forEach(row => {
+                const investment = row['投資意願'];
+                // 只計算有效的投資意願資料
+                if (investment && investment !== '') {
+                    investmentCount[investment] = (investmentCount[investment] || 0) + 1;
+                }
+            });
+            
+            // 如果沒有有效資料，顯示空狀態
+            if (Object.keys(investmentCount).length === 0) {
+                if (charts.investment) {
+                    charts.investment.destroy();
+                }
+                const ctx = document.getElementById('investmentChart').getContext('2d');
+                charts.investment = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['暫無資料'],
+                        datasets: [{
+                            data: [1],
+                            backgroundColor: ['rgba(200, 200, 200, 0.5)']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                return;
+            }
+            
+            const investmentLabels = {
+                'very_willing': '非常願意',
+                'consider': '可以考慮',
+                'need_evaluation': '需要評估',
+                'not_interested': '沒有意願'
+            };
+            
+            const labels = Object.keys(investmentCount).map(key => investmentLabels[key] || key);
+            const values = Object.values(investmentCount);
+            
+            if (charts.investment) {
+                charts.investment.destroy();
+            }
+            
+            const ctx = document.getElementById('investmentChart').getContext('2d');
+            charts.investment = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            '#2ecc71',
+                            '#f39c12',
+                            '#e67e22',
+                            '#e74c3c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+        
+        // 更新趨勢圖表
+        function updateTrendsChart(data) {
+            const dateCount = {};
+            data.forEach(row => {
+                const submitTime = row['填答時間'];
+                if (submitTime) {
+                    const date = new Date(submitTime).toLocaleDateString('zh-TW');
+                    dateCount[date] = (dateCount[date] || 0) + 1;
+                }
+            });
+            
+            const sortedDates = Object.keys(dateCount).sort((a, b) => new Date(a) - new Date(b));
+            const values = sortedDates.map(date => dateCount[date]);
+            
+            if (charts.trends) {
+                charts.trends.destroy();
+            }
+            
+            const ctx = document.getElementById('trendsChart').getContext('2d');
+            charts.trends = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sortedDates,
+                    datasets: [{
+                        label: '每日回覆數',
+                        data: values,
+                        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                        borderColor: '#2ecc71',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '回覆數量'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新詳細排序表格
+        function updateRankingTable(data) {
+            const tbody = document.getElementById('rankingTableBody');
+            tbody.innerHTML = '';
+            
+            // 收集所有排序資料
+            const allRankings = [];
+            
+            // 挑戰排序
+            const challengeRanks = calculateAverageRanks(data, [
+                '人力不足_排序', '記錄繁瑣_排序', '狀況監測困難_排序', 
+                '品質不一致_排序', '情緒安撫困難_排序', '新手上手慢_排序',
+                '家屬溝通_排序', '安全監測困難_排序', '緊急應變不及時_排序', '異常行為察覺_排序'
+            ]);
+            
+            Object.entries(challengeRanks).forEach(([key, value]) => {
+                allRankings.push({
+                    category: '挑戰',
+                    name: key.replace('_排序', ''),
+                    avgRank: value,
+                    count: getResponseCount(data, key),
+                    importance: getRankImportance(value)
+                });
+            });
+            
+            // 個人化資訊排序
+            const infoRanks = calculateAverageRanks(data, [
+                '溝通偏好_排序', '個人喜好_排序', '情緒安撫_排序', 
+                '身體狀況_排序', '生活習慣_排序', '家屬互動_排序',
+                '認知溝通_排序', '突發經驗_排序'
+            ]);
+            
+            Object.entries(infoRanks).forEach(([key, value]) => {
+                allRankings.push({
+                    category: '個人化資訊',
+                    name: key.replace('_排序', ''),
+                    avgRank: value,
+                    count: getResponseCount(data, key),
+                    importance: getRankImportance(value)
+                });
+            });
+            
+            // 改善優先項目排序
+            const priorityRanks = calculateAverageRanks(data, [
+                '提高效率_排序', '提升品質_排序', '強化安全_排序', 
+                '縮短培訓_排序', '提高滿意度_排序', '減輕負擔_排序', '改善溝通_排序'
+            ]);
+            
+            Object.entries(priorityRanks).forEach(([key, value]) => {
+                allRankings.push({
+                    category: '改善優先項目',
+                    name: key.replace('_排序', ''),
+                    avgRank: value,
+                    count: getResponseCount(data, key),
+                    importance: getRankImportance(value)
+                });
+            });
+            
+            // 如果沒有任何排序資料，顯示空狀態
+            if (allRankings.length === 0) {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td colspan="5" style="text-align: center; color: #999; padding: 20px;">
+                        暫無有效的排序資料
+                    </td>
+                `;
+                return;
+            }
+            
+            // 按平均排序排列
+            allRankings.sort((a, b) => a.avgRank - b.avgRank);
+            
+            // 產生表格行
+            allRankings.forEach(item => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${item.category}</td>
+                    <td>${item.name}</td>
+                    <td>${item.avgRank.toFixed(2)}</td>
+                    <td>${item.count}</td>
+                    <td>${item.importance}</td>
+                `;
+            });
+        }
+        
+        // 輔助函數
+        function calculateAverageRanks(data, columns) {
+            const ranks = {};
+            
+            columns.forEach(column => {
+                // 修正：正確處理空字符串和無效值
+                const values = data.map(row => {
+                    const val = row[column];
+                    const num = parseInt(val);
+                    // 只取有效的數字值，排除空字符串、null、undefined
+                    return (val && val !== '' && !isNaN(num) && num > 0) ? num : null;
+                }).filter(val => val !== null);
+                
+                if (values.length > 0) {
+                    ranks[column] = values.reduce((a, b) => a + b, 0) / values.length;
+                }
+            });
+            
+            return ranks;
+        }
+        
+        function calculateAverageScores(data, columns) {
+            const scores = {};
+            
+            columns.forEach(column => {
+                // 修正：正確處理空字符串和無效值
+                const values = data.map(row => {
+                    const val = row[column];
+                    const num = parseInt(val);
+                    // 只取有效的數字值，排除空字符串、null、undefined
+                    return (val && val !== '' && !isNaN(num) && num > 0) ? num : null;
+                }).filter(val => val !== null);
+                
+                if (values.length > 0) {
+                    scores[column] = values.reduce((a, b) => a + b, 0) / values.length;
+                }
+            });
+            
+            return scores;
+        }
+        
+        function getResponseCount(data, column) {
+            return data.filter(row => row[column] && row[column] !== '').length;
+        }
+        
+        function getRankImportance(avgRank) {
+            if (avgRank <= 2) return '極重要';
+            if (avgRank <= 3) return '重要';
+            if (avgRank <= 4) return '中等';
+            return '次要';
+        }
+        
+        // UI 控制函數
+        function showLoading(show) {
+            document.getElementById('loadingMessage').style.display = show ? 'block' : 'none';
+            document.getElementById('refreshBtn').disabled = show;
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(successDiv, container.firstChild);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        }
+        
+        function updateLastUpdateTime() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = 
+                `最後更新: ${now.toLocaleString('zh-TW')}`;
+        }
+        
+        // 自動更新功能
+        function toggleAutoRefresh() {
+            const btn = document.getElementById('autoRefreshBtn');
+            
+            if (autoRefreshTimer) {
+                clearInterval(autoRefreshTimer);
+                autoRefreshTimer = null;
+                btn.textContent = '開啟自動更新';
+                btn.style.backgroundColor = '#3498db';
+            } else {
+                autoRefreshTimer = setInterval(loadAndAnalyzeData, CONFIG.AUTO_REFRESH_INTERVAL);
+                btn.textContent = '關閉自動更新';
+                btn.style.backgroundColor = '#e74c3c';
+                showSuccess('自動更新已開啟，每5分鐘更新一次');
+            }
+        }
+        
+        // 匯出報告功能
+        function exportReport() {
+            if (!currentData) {
+                showError('沒有資料可以匯出');
+                return;
+            }
+            
+            // 產生報告內容
+            const reportData = {
+                exportTime: new Date().toISOString(),
+                totalResponses: currentData.length,
+                data: currentData
+            };
+            
+            // 下載 JSON 檔案
+            const blob = new Blob([JSON.stringify(reportData, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `問卷分析報告_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showSuccess('報告已匯出');
+        }
+    </script>
+</body>
+</html>
